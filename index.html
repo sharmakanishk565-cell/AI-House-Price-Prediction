@@ -1,0 +1,509 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI House Price Prediction Dashboard</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#0f172a,#1e3a8a,#312e81);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:30px;
+    overflow-x:hidden;
+}
+
+.container{
+    width:100%;
+    max-width:1400px;
+}
+
+.dashboard{
+    display:grid;
+    grid-template-columns:1fr 420px;
+    gap:25px;
+}
+
+.left-panel{
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:25px;
+    padding:35px;
+    color:white;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+
+.right-panel{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+}
+
+.card{
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(14px);
+    border-radius:25px;
+    padding:25px;
+    border:1px solid rgba(255,255,255,0.1);
+    color:white;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+}
+
+.header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:30px;
+}
+
+.header h1{
+    font-size:38px;
+    font-weight:700;
+}
+
+.subtitle{
+    color:#cbd5e1;
+    margin-top:8px;
+}
+
+.badge{
+    background:linear-gradient(135deg,#06b6d4,#3b82f6);
+    padding:10px 18px;
+    border-radius:50px;
+    font-size:14px;
+    font-weight:600;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.input-box{
+    display:flex;
+    flex-direction:column;
+}
+
+.input-box label{
+    margin-bottom:8px;
+    font-size:14px;
+    color:#e2e8f0;
+}
+
+.input-box input,
+.input-box select{
+    padding:14px;
+    border:none;
+    outline:none;
+    border-radius:12px;
+    background:rgba(255,255,255,0.12);
+    color:white;
+    font-size:15px;
+}
+
+.input-box input::placeholder{
+    color:#cbd5e1;
+}
+
+.input-box select option{
+    color:black;
+}
+
+.predict-btn{
+    width:100%;
+    margin-top:28px;
+    padding:16px;
+    border:none;
+    border-radius:16px;
+    background:linear-gradient(135deg,#8b5cf6,#2563eb);
+    color:white;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.predict-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 25px rgba(99,102,241,0.4);
+}
+
+.result-box{
+    margin-top:25px;
+    background:rgba(255,255,255,0.08);
+    padding:25px;
+    border-radius:18px;
+    text-align:center;
+}
+
+.result-box h2{
+    color:#cbd5e1;
+    margin-bottom:10px;
+}
+
+.price{
+    font-size:42px;
+    font-weight:700;
+    color:#4ade80;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+.stat-card{
+    background:rgba(255,255,255,0.08);
+    border-radius:18px;
+    padding:20px;
+}
+
+.stat-card h3{
+    font-size:15px;
+    color:#cbd5e1;
+}
+
+.stat-card p{
+    margin-top:8px;
+    font-size:28px;
+    font-weight:700;
+}
+
+.chart-container{
+    height:260px;
+    margin-top:10px;
+}
+
+.footer-note{
+    margin-top:25px;
+    text-align:center;
+    color:#cbd5e1;
+    font-size:13px;
+}
+
+@media(max-width:1100px){
+
+.dashboard{
+    grid-template-columns:1fr;
+}
+
+}
+
+@media(max-width:700px){
+
+.form-grid{
+    grid-template-columns:1fr;
+}
+
+.header{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:15px;
+}
+
+.header h1{
+    font-size:30px;
+}
+
+.price{
+    font-size:32px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="dashboard">
+
+<div class="left-panel">
+
+<div class="header">
+
+<div>
+<h1>🏠 AI House Price Prediction</h1>
+<p class="subtitle">Advanced Smart Real Estate Prediction Dashboard</p>
+</div>
+
+<div class="badge">AI Powered</div>
+
+</div>
+
+<div class="form-grid">
+
+<div class="input-box">
+<label>Area (sq ft)</label>
+<input type="number" id="area" placeholder="7420">
+</div>
+
+<div class="input-box">
+<label>Bedrooms</label>
+<input type="number" id="bedrooms" placeholder="4">
+</div>
+
+<div class="input-box">
+<label>Bathrooms</label>
+<input type="number" id="bathrooms" placeholder="2">
+</div>
+
+<div class="input-box">
+<label>Stories</label>
+<input type="number" id="stories" placeholder="3">
+</div>
+
+<div class="input-box">
+<label>Parking</label>
+<input type="number" id="parking" placeholder="2">
+</div>
+
+<div class="input-box">
+<label>Main Road</label>
+<select id="mainroad">
+<option value="1">Yes</option>
+<option value="0">No</option>
+</select>
+</div>
+
+<div class="input-box">
+<label>Guest Room</label>
+<select id="guestroom">
+<option value="1">Yes</option>
+<option value="0">No</option>
+</select>
+</div>
+
+<div class="input-box">
+<label>Basement</label>
+<select id="basement">
+<option value="1">Yes</option>
+<option value="0">No</option>
+</select>
+</div>
+
+<div class="input-box">
+<label>Air Conditioning</label>
+<select id="airconditioning">
+<option value="1">Yes</option>
+<option value="0">No</option>
+</select>
+</div>
+
+<div class="input-box">
+<label>Preferred Area</label>
+<select id="prefarea">
+<option value="1">Yes</option>
+<option value="0">No</option>
+</select>
+</div>
+
+<div class="input-box">
+<label>Furnishing</label>
+<select id="furnishing">
+<option value="2">Furnished</option>
+<option value="1">Semi Furnished</option>
+<option value="0">Unfurnished</option>
+</select>
+</div>
+
+</div>
+
+<button class="predict-btn" onclick="predictPrice()">
+✨ Predict House Price
+</button>
+
+<div class="result-box">
+<h2>Estimated House Price</h2>
+<div class="price" id="result">₹ 0</div>
+</div>
+
+<div class="footer-note">
+Machine Learning Inspired Real Estate Prediction Dashboard
+</div>
+
+</div>
+
+<div class="right-panel">
+
+<div class="card">
+<h2>📊 Market Analytics</h2>
+<div class="chart-container">
+<canvas id="priceChart"></canvas>
+</div>
+</div>
+
+<div class="stats">
+
+<div class="stat-card">
+<h3>Market Growth</h3>
+<p>+18%</p>
+</div>
+
+<div class="stat-card">
+<h3>AI Accuracy</h3>
+<p>94%</p>
+</div>
+
+<div class="stat-card">
+<h3>Avg Area</h3>
+<p>6200</p>
+</div>
+
+<div class="stat-card">
+<h3>Properties</h3>
+<p>1.2K</p>
+</div>
+
+</div>
+
+<div class="card">
+<h2>🏡 Property Insights</h2>
+<div class="chart-container">
+<canvas id="barChart"></canvas>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function predictPrice(){
+
+    let area = parseInt(document.getElementById("area").value) || 0;
+    let bedrooms = parseInt(document.getElementById("bedrooms").value) || 0;
+    let bathrooms = parseInt(document.getElementById("bathrooms").value) || 0;
+    let stories = parseInt(document.getElementById("stories").value) || 0;
+    let parking = parseInt(document.getElementById("parking").value) || 0;
+
+    let mainroad = parseInt(document.getElementById("mainroad").value);
+    let guestroom = parseInt(document.getElementById("guestroom").value);
+    let basement = parseInt(document.getElementById("basement").value);
+    let airconditioning = parseInt(document.getElementById("airconditioning").value);
+    let prefarea = parseInt(document.getElementById("prefarea").value);
+    let furnishing = parseInt(document.getElementById("furnishing").value);
+
+    let price =
+        (area * 3500) +
+        (bedrooms * 500000) +
+        (bathrooms * 350000) +
+        (stories * 250000) +
+        (parking * 150000) +
+        (mainroad * 200000) +
+        (guestroom * 150000) +
+        (basement * 180000) +
+        (airconditioning * 220000) +
+        (prefarea * 300000) +
+        (furnishing * 250000);
+
+    document.getElementById("result").innerHTML =
+        "₹ " + price.toLocaleString();
+}
+
+const ctx = document.getElementById('priceChart');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        datasets: [{
+            label: 'House Prices',
+            data: [45, 52, 48, 60, 72, 81],
+            borderColor: '#60a5fa',
+            backgroundColor: 'rgba(96,165,250,0.2)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive:true,
+        plugins:{
+            legend:{
+                labels:{
+                    color:'white'
+                }
+            }
+        },
+        scales:{
+            x:{
+                ticks:{color:'white'}
+            },
+            y:{
+                ticks:{color:'white'}
+            }
+        }
+    }
+});
+
+const bar = document.getElementById('barChart');
+
+new Chart(bar, {
+    type: 'bar',
+    data: {
+        labels: ['1BHK','2BHK','3BHK','4BHK'],
+        datasets: [{
+            label: 'Demand',
+            data: [20, 45, 70, 55],
+            backgroundColor: [
+                '#38bdf8',
+                '#818cf8',
+                '#8b5cf6',
+                '#22c55e'
+            ],
+            borderRadius:10
+        }]
+    },
+    options: {
+        responsive:true,
+        plugins:{
+            legend:{
+                labels:{
+                    color:'white'
+                }
+            }
+        },
+        scales:{
+            x:{
+                ticks:{color:'white'}
+            },
+            y:{
+                ticks:{color:'white'}
+            }
+        }
+    }
+});
+
+</script>
+
+</body>
+</html>
+
